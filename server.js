@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
 const MckHelpers = require('./helper');
 
 const app = express();

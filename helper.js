@@ -78,25 +78,37 @@ async function parseDaysToSelection(formattedDays, day) {
 
     const soupEmporium = selectedDay
         .substring(selectedDay.indexOf(SOUP_EMPORIUM), selectedDay.indexOf(MORNING_EDITIONS))
+        .replace(/\n/g, " ")
+        .replace(/  +/g, " ")
         .trim();
     const morningEditions = selectedDay
         .substring(selectedDay.indexOf(MORNING_EDITIONS), selectedDay.indexOf(FRESH_GRILL))
+        .replace(/\n/g, " ")
+        .replace(/  +/g, " ")
         .trim();
 
     const freshGrill = selectedDay
         .substring(selectedDay.indexOf(FRESH_GRILL), selectedDay.indexOf(CULINARY_TABLE))
+        .replace(/\n/g, " ")
+        .replace(/  +/g, " ")
         .trim();
 
     const culinaryTable = selectedDay
         .substring(selectedDay.indexOf(CULINARY_TABLE), selectedDay.indexOf(MENUTAIMENT))
+        .replace(/\n/g, " ")
+        .replace(/  +/g, " ")
         .trim();
 
     const menutaiment = selectedDay
         .substring(selectedDay.indexOf(MENUTAIMENT), selectedDay.indexOf(PANINI_SPECIAL))
+        .replace(/\n/g, " ")
+        .replace(/  +/g, " ")
         .trim();
 
     const paniniSpecial = selectedDay
         .substring(selectedDay.indexOf(PANINI_SPECIAL), selectedDay.length)
+        .replace(/\n/g, " ")
+        .replace(/  +/g, " ")
         .trim();
 
     menu.push(soupEmporium);
@@ -108,6 +120,17 @@ async function parseDaysToSelection(formattedDays, day) {
 
     return menu;
 }
+
+const getPrice = (unformattedString) => unformattedString
+        .substring(unformattedString.search(/\d/))
+        .trim();
+
+const getFood = (unformattedString, categoryString) => unformattedString
+        .substring(unformattedString.indexOf(categoryString), unformattedString.search(/\d/))
+        .replace('/Combo', '')
+        .replace('price', '')
+        .replace(categoryString, '')
+        .trim();
 
 async function printMenuSelection(formattedSelection, day) {
     if (formattedSelection != null) {
