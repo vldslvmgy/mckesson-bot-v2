@@ -5,11 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
-    "start": "node server.js"
-=======
     "debug": "node --nolazy --inspect-brk=5858 server.js"
->>>>>>> adfb918d2e15c59c21e8d1a05b909510c3653887
   },
   "repository": {
     "type": "git",
@@ -25,12 +21,8 @@
     "morgan": "^1.9.1",
     "nodemon": "^1.18.10",
     "pdf-parse": "^1.1.1",
-<<<<<<< HEAD
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "request-promise-native": "^1.0.7"
-=======
-    "request": "^2.88.0"
->>>>>>> adfb918d2e15c59c21e8d1a05b909510c3653887
   }
 }

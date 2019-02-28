@@ -177,9 +177,26 @@ async function getMenu(day) {
     const formattedDays = await parseMenuToDays(formattedText);
     const formattedSelection = await parseDaysToSelection(formattedDays, day);
     const menuString = await printMenuSelection(formattedSelection, day);
-    return menuString
+    return getFormat(menuString)
+}
+
+function getFormat(menuString) {
+    return {
+        attachments: [
+          {
+            color: '#ef004b',
+            title: `Menu`,
+            fields: [
+              {
+                value: menuString,
+                short: false,
+              },
+            ],
+          },
+        ],
+      }
 }
 
 module.exports = {
-    getMenu
+    getMenu,
 }
