@@ -184,7 +184,7 @@ function getFormat(menuString) {
     return {
         attachments: [
           {
-            color: '#ef004b',
+            color: '#f4a442',
             title: `Menu`,
             fields: [
               {

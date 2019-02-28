@@ -20,9 +20,7 @@ function getCalories(foodName, isSoup) {
     json: true
   })
   .then((food) => {
-    console.log(food)
     const calories = sumCalories(food.foods);
-    console.log(calories)
     return calories;
   });
 }
