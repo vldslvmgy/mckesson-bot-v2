@@ -14,9 +14,12 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "cheerio": "^1.0.0-rc.2",
     "express": "^4.16.4",
+    "file-system": "^2.2.2",
     "morgan": "^1.9.1",
     "nodemon": "^1.18.10",
-    "pdf-parse": "^1.1.1"
+    "pdf-parse": "^1.1.1",
+    "request": "^2.88.0"
   }
 }
