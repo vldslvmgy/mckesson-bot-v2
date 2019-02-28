@@ -10,14 +10,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/mckesson', async (req, res) => {
-    const formattedText = await MckHelpers.parseMenuText();
-    const formattedDays = await MckHelpers.parseMenuToDays(formattedText);
-    const formattedSelection = await MckHelpers.parseDaysToSelection(formattedDays, req.body.text);
-    const menuString = await MckHelpers.printMenuSelection(formattedSelection, req.body.text);
-
-    res.send(menuString);
+    // req.body.text is the day of the week
+    res.send(await MckHelpers.getMenu(req.body.text));
 });
-``
+
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });

@@ -140,9 +140,23 @@ async function printMenuSelection(formattedSelection, day) {
     }
 }
 
+function dayOfWeekAsString(dayIndex) {
+    return ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"][dayIndex];
+}
+
+function getToday() {
+    return dayOfWeekAsString((new Date).getDay() - 1)
+}
+
+async function getMenu(day) {
+    day = day ? day : getToday();
+    const formattedText = await parseMenuText();
+    const formattedDays = await parseMenuToDays(formattedText);
+    const formattedSelection = await parseDaysToSelection(formattedDays, day);
+    const menuString = await printMenuSelection(formattedSelection, day);
+    return menuString
+}
+
 module.exports = {
-    parseMenuText,
-    parseMenuToDays,
-    parseDaysToSelection,
-    printMenuSelection
+    getMenu
 }
