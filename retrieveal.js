@@ -18,11 +18,10 @@ request({
 
    if(link && link.match(/Menus/)){
      console.log(text + ' --> ' + link);
-     request(link, function(error, response, body){
-        fs.writeFileSync('menu.pdf',body,'binary');
+     request({url: link, encoding: null},  function(error, response, body){
+        fs.writeFileSync('menu.pdf',body);
     })
    };
-   
  });
 
 });
