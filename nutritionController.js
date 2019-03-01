@@ -21,7 +21,10 @@ function getCalories(foodName, isSoup) {
   .then((food) => {
     const calories = sumCalories(food.foods);
     return calories;
-  });
+  })
+  .catch(() => {
+    return 'N/A';
+  })
 }
 
 const sumCalories = (foods) => {
