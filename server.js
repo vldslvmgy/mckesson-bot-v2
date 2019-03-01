@@ -10,7 +10,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/mckesson', async (req, res) => {
     // req.body.text is the day of the week
-    res.send(await MckHelpers.getMenu(req.body.text));
+    await MckHelpers.getMenu(req.body.text)
+        .then((menu) => {
+            res.send(menu);
+        })
 });
 
 app.listen(port, () => {

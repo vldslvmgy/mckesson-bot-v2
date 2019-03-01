@@ -1,5 +1,6 @@
 const fs = require('fs');
 const pdf = require('pdf-parse');
+const { getCalories } = require('./nutritionController')
 
 const SOUP_EMPORIUM = "Soup Emporium";
 const MORNING_EDITIONS = "Morning Editions";
@@ -132,6 +133,50 @@ const getFood = (unformattedString, categoryString) => unformattedString
         .replace(categoryString, '')
         .trim();
 
+const getJSONMenu = async (menuSelections, selectedDay) => {
+    return {
+        day: selectedDay, 
+        items: [
+            {
+                category: SOUP_EMPORIUM, 
+                food: getFood(menuSelections[0], SOUP_EMPORIUM),
+                price: getPrice(menuSelections[0]),
+                calories: await getCalories(getFood(menuSelections[0], SOUP_EMPORIUM), true)
+            },
+            {
+                category: MORNING_EDITIONS, 
+                food: getFood(menuSelections[1], MORNING_EDITIONS),
+                price: getPrice(menuSelections[1]),
+                calories: await getCalories(getFood(menuSelections[1], MORNING_EDITIONS), false)
+            },
+            {
+                category: FRESH_GRILL, 
+                food: getFood(menuSelections[2], FRESH_GRILL),
+                price: getPrice(menuSelections[2]),
+                calories: await getCalories(getFood(menuSelections[2], FRESH_GRILL), false)
+            },
+            {
+                category: CULINARY_TABLE, 
+                food: getFood(menuSelections[3], CULINARY_TABLE),
+                price: getPrice(menuSelections[3]),
+                calories: await getCalories(getFood(menuSelections[3], CULINARY_TABLE), false)
+            },
+            {
+                category: MENUTAIMENT, 
+                food: getFood(menuSelections[4], MENUTAIMENT),
+                price: getPrice(menuSelections[4]),
+                calories: await getCalories(getFood(menuSelections[4], MENUTAIMENT), false)
+            },
+            {
+                category: PANINI_SPECIAL, 
+                food: getFood(menuSelections[5], PANINI_SPECIAL),
+                price: getPrice(menuSelections[5]),
+                calories: await getCalories(getFood(menuSelections[5], PANINI_SPECIAL), false)  
+            }
+        ]
+    }
+}
+
 async function printMenuSelection(formattedSelection, day) {
     if (formattedSelection != null) {
         let selectedDay;
@@ -176,25 +221,33 @@ async function getMenu(day) {
     const formattedText = await parseMenuText();
     const formattedDays = await parseMenuToDays(formattedText);
     const formattedSelection = await parseDaysToSelection(formattedDays, day);
-    const menuString = await printMenuSelection(formattedSelection, day);
-    return getFormat(menuString)
+    return await getJSONMenu(formattedSelection, day)
+        .then((JSONMenu) => {
+            return getFormat(JSONMenu);
+        });
+
 }
 
 function getFormat(menuString) {
-    return {
+    const format = {
         attachments: [
           {
             color: '#f4a442',
-            title: `Menu`,
-            fields: [
-              {
-                value: menuString,
-                short: false,
-              },
-            ],
+            title: menuString.day,
+            fields: [],
           },
         ],
-      }
+      };
+
+    menuString.items.forEach((item) => {
+        format.attachments[0].fields.push({
+            title: item.category,
+            value: item.food,
+            pretext: item.price,
+            text: item.calories
+        });
+    });
+    return format;
 }
 
 module.exports = {

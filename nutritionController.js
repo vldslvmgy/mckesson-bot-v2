@@ -6,8 +6,7 @@ routes.get('/', (req, res) => {
 });
 
 function getCalories(foodName, isSoup) {
-  const queryString = isSoup === true ? "500 grams" + foodName + "soup" : foodName;
-  console.log(queryString);
+  const queryString = isSoup === true ? "500 grams " + foodName + " soup" : foodName;
   return request.post({
     uri: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
     headers: {
