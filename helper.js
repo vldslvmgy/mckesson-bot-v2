@@ -134,7 +134,6 @@ const getFood = (unformattedString, categoryString) => unformattedString
         .trim();
 
 const getJSONMenu = async (menuSelections, selectedDay) => {
-    console.log(menuSelections[0]);
     return {
         day: selectedDay, 
         items: [
@@ -222,26 +221,33 @@ async function getMenu(day) {
     const formattedText = await parseMenuText();
     const formattedDays = await parseMenuToDays(formattedText);
     const formattedSelection = await parseDaysToSelection(formattedDays, day);
-    const menuString = await printMenuSelection(formattedSelection, day);
+    return await getJSONMenu(formattedSelection, day)
+        .then((JSONMenu) => {
+            return getFormat(JSONMenu);
+        });
 
-    return getJSONMenu(formattedSelection, day);
 }
 
 function getFormat(menuString) {
-    return {
+    const format = {
         attachments: [
           {
-            color: '#ef004b',
-            title: `Menu`,
-            fields: [
-              {
-                value: menuString,
-                short: false,
-              },
-            ],
+            color: '#f4a442',
+            title: menuString.day,
+            fields: [],
           },
         ],
-      }
+      };
+
+    menuString.items.forEach((item) => {
+        format.attachments[0].fields.push({
+            title: item.category,
+            value: item.food,
+            pretext: item.price,
+            text: item.calories
+        });
+    });
+    return format;
 }
 
 module.exports = {
