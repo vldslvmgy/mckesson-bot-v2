@@ -129,7 +129,9 @@ const getPrice = (unformattedString) => unformattedString
 const getFood = (unformattedString, categoryString) => unformattedString
         .substring(unformattedString.indexOf(categoryString), unformattedString.search(/\d/))
         .replace('/Combo', '')
+        .replace('/ Combo', '')
         .replace('price', '')
+        .replace('Price', '')
         .replace(categoryString, '')
         .trim();
 
@@ -242,8 +244,8 @@ function getFormat(menuString) {
     menuString.items.forEach((item) => {
         format.attachments[0].fields.push({
             title: item.category,
-            value: `*Item*: ${item.food}\n*Price*: ${item.price}\n*Calories*: ${item.calories}`,
-            pretext: item.price,
+            value: `*Item*: ${item.food}\n*Price*: ${item.price.replace('Chef’s Selection','')}\n*Calories*: ${item.calories}`,
+            pretext: item.price.replace('Chef’s Selection',''),
             text: item.calories
         });
     });
