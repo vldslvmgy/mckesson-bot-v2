@@ -242,7 +242,7 @@ function getFormat(menuString) {
     menuString.items.forEach((item) => {
         format.attachments[0].fields.push({
             title: item.category,
-            value: item.food,
+            value: `${item.food}\nPrice: ${item.price}\nCalories: ${item.calories}`,
             pretext: item.price,
             text: item.calories
         });
