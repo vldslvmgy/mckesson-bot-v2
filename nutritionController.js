@@ -10,8 +10,8 @@ function getCalories(foodName, isSoup) {
   return request.post({
     uri: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
     headers: {
-      'x-app-id': '6a377e5b',
-      'x-app-key': '7a491a27adefa9981b7e9a51af67b80a',
+      'x-app-id': '70f872c0',
+      'x-app-key': '1dc3bfcfe831beb1435e46191e1bb5a8',
     },
     body: {
       query: queryString
