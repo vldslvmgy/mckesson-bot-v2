@@ -211,7 +211,7 @@ async function printMenuSelection(formattedSelection, day) {
 }
 
 function dayOfWeekAsString(dayIndex) {
-    return ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"][dayIndex];
+    return ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][dayIndex];
 }
 
 function getToday() {
