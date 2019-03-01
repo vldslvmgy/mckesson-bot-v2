@@ -129,6 +129,7 @@ const getPrice = (unformattedString) => unformattedString
 const getFood = (unformattedString, categoryString) => unformattedString
         .substring(unformattedString.indexOf(categoryString), unformattedString.search(/\d/))
         .replace('/Combo', '')
+        .replace('Combo', '')
         .replace('/ Combo', '')
         .replace('price', '')
         .replace('Price', '')
