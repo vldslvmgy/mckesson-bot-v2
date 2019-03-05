@@ -1,6 +1,7 @@
 const fs = require('fs');
 const pdf = require('pdf-parse');
-const { getCalories } = require('./nutritionController')
+
+const { getCalories } = require('./nutritionController');
 
 const SOUP_EMPORIUM = "Soup Emporium";
 const MORNING_EDITIONS = "Morning Editions";
@@ -16,8 +17,36 @@ const WEDNESDAY = "Wed";
 const THURSDAY = "Thurs";
 const FRIDAY = "Frid";
 
-let dataBuffer = fs.readFileSync('./menu.pdf');
+let dataBuffer = {};
 
+
+function dayOfWeekAsString(dayIndex) {
+    return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][dayIndex];
+}
+
+function getToday() {
+    return dayOfWeekAsString((new Date).getDay() - 1)
+}
+
+function getFullDayName(day) {
+    if (day) {
+        day = day.toLowerCase();
+        if (day.includes("mon")) {
+            return "monday";
+        } else if (day.includes("tue")) {
+            return "tuesday";
+        } else if (day.includes("wed")) {
+            return "wednesday";
+        } else if (day.includes("thur")) {
+            return "thursday";
+        } else if (day.includes("fri")) {
+            return "friday";
+        } else {
+            return getToday();
+        }
+    }
+    return getToday();
+}
 async function parseMenuText() {
     return await pdf(dataBuffer).then(function (data) {
 
@@ -25,6 +54,8 @@ async function parseMenuText() {
             .replace(/  +/g, ' ')
             .replace('PRICES DO NOT INCLUDE GST.', "")
             .replace('Chef’s Selection', "");
+    }).catch(e => {
+        console.log(e);
     });
 }
 
@@ -123,58 +154,58 @@ async function parseDaysToSelection(formattedDays, day) {
 }
 
 const getPrice = (unformattedString) => unformattedString
-        .substring(unformattedString.search(/\d/))
-        .trim();
+    .substring(unformattedString.search(/\d/))
+    .trim();
 
 const getFood = (unformattedString, categoryString) => unformattedString
-        .substring(unformattedString.indexOf(categoryString), unformattedString.search(/\d/))
-        .replace('/Combo', '')
-        .replace('Combo', '')
-        .replace('/ Combo', '')
-        .replace('price', '')
-        .replace('Price', '')
-        .replace(categoryString, '')
-        .trim();
+    .substring(unformattedString.indexOf(categoryString), unformattedString.search(/\d/))
+    .replace('/Combo', '')
+    .replace('Combo', '')
+    .replace('/ Combo', '')
+    .replace('price', '')
+    .replace('Price', '')
+    .replace(categoryString, '')
+    .trim();
 
 const getJSONMenu = async (menuSelections, selectedDay) => {
     return {
-        day: selectedDay, 
+        day: selectedDay,
         items: [
             {
-                category: SOUP_EMPORIUM, 
+                category: SOUP_EMPORIUM,
                 food: getFood(menuSelections[0], SOUP_EMPORIUM),
                 price: getPrice(menuSelections[0]),
                 calories: await getCalories(getFood(menuSelections[0], SOUP_EMPORIUM), true)
             },
             {
-                category: MORNING_EDITIONS, 
+                category: MORNING_EDITIONS,
                 food: getFood(menuSelections[1], MORNING_EDITIONS),
                 price: getPrice(menuSelections[1]),
                 calories: await getCalories(getFood(menuSelections[1], MORNING_EDITIONS), false)
             },
             {
-                category: FRESH_GRILL, 
+                category: FRESH_GRILL,
                 food: getFood(menuSelections[2], FRESH_GRILL),
                 price: getPrice(menuSelections[2]),
                 calories: await getCalories(getFood(menuSelections[2], FRESH_GRILL), false)
             },
             {
-                category: CULINARY_TABLE, 
+                category: CULINARY_TABLE,
                 food: getFood(menuSelections[3], CULINARY_TABLE),
                 price: getPrice(menuSelections[3]),
                 calories: await getCalories(getFood(menuSelections[3], CULINARY_TABLE), false)
             },
             {
-                category: MENUTAIMENT, 
+                category: MENUTAIMENT,
                 food: getFood(menuSelections[4], MENUTAIMENT),
                 price: getPrice(menuSelections[4]),
                 calories: await getCalories(getFood(menuSelections[4], MENUTAIMENT), false)
             },
             {
-                category: PANINI_SPECIAL, 
+                category: PANINI_SPECIAL,
                 food: getFood(menuSelections[5], PANINI_SPECIAL),
                 price: getPrice(menuSelections[5]),
-                calories: await getCalories(getFood(menuSelections[5], PANINI_SPECIAL), false)  
+                calories: await getCalories(getFood(menuSelections[5], PANINI_SPECIAL), false)
             }
         ]
     }
@@ -211,22 +242,36 @@ async function printMenuSelection(formattedSelection, day) {
     }
 }
 
-function dayOfWeekAsString(dayIndex) {
-    return ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][dayIndex];
-}
+function getCachedMenu(day) {
+    day = getFullDayName(day);
+    if (fs.existsSync(`./menu-cache/${day}.json`)) {
+        return JSON.parse(fs.readFileSync(`./menu-cache/${day}.json`, 'utf8'));
+    }
+};
 
-function getToday() {
-    return dayOfWeekAsString((new Date).getDay() - 1)
+function cacheMenu(menu, day) {
+    // If the day argument is partial (ex: 'tues'), get the full day string
+    day = getFullDayName(day);
+    if (day) {
+        fs.writeFile(`./menu-cache/${day}.json`, JSON.stringify(menu), 'utf8', err => {
+            if (err) console.log(err);
+        });
+    }
 }
 
 async function getMenu(day) {
-    day = day ? day : getToday();
+    day = getFullDayName(day);
+    const cachedMenu = getCachedMenu(day);
+    if (cachedMenu) return cachedMenu;
+    dataBuffer = fs.readFileSync('./menu.pdf');
     const formattedText = await parseMenuText();
     const formattedDays = await parseMenuToDays(formattedText);
     const formattedSelection = await parseDaysToSelection(formattedDays, day);
     return await getJSONMenu(formattedSelection, day)
         .then((JSONMenu) => {
-            return getFormat(JSONMenu);
+            const formattedMenu = getFormat(JSONMenu);
+            cacheMenu(formattedMenu, day);
+            return formattedMenu;
         });
 
 }
@@ -234,19 +279,20 @@ async function getMenu(day) {
 function getFormat(menuString) {
     const format = {
         attachments: [
-          {
-            color: '#f4a442',
-            title: menuString.day,
-            fields: [],
-          },
+            {
+                color: '#f4a442',
+                title: menuString.day,
+                fields: [],
+            },
         ],
-      };
+    };
 
     menuString.items.forEach((item) => {
+        const calories = String(item.calories).split('.')[0];
         format.attachments[0].fields.push({
             title: item.category,
-            value: `*Item*: ${item.food}\n*Price*: ${item.price.replace('Chef’s Selection','')}\n*Calories*: ${item.calories}`,
-            pretext: item.price.replace('Chef’s Selection',''),
+            value: `*Item*: ${item.food}\n*Price*: ${item.price.replace('Chef’s Selection', '')}\n*Calories (approx.)*: ${calories}`,
+            pretext: item.price.replace('Chef’s Selection', ''),
             text: item.calories
         });
     });
@@ -255,4 +301,4 @@ function getFormat(menuString) {
 
 module.exports = {
     getMenu,
-}
+};

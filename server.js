@@ -1,19 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const MckHelpers = require('./helper');
+const mainController = require('./mainController')
 
 const app = express();
 const port = process.env.PORT || 3939;
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/mckesson', async (req, res) => {
-    // req.body.text is the day of the week
-    await MckHelpers.getMenu(req.body.text)
-        .then((menu) => {
-            res.send(menu);
-        })
+    await mainController.processRequest(req, res).then((menu) => {
+        return res.send(menu);
+    });
 });
 
 app.listen(port, () => {
