@@ -18,6 +18,8 @@ async function downloadFile(url, res, callback) {
                 fs.unlink('menu-backup.pdf', err => {
                     if (err) return err;
                 });
+                // Invalid Cache
+                invalidateMenuCache();
             });
         });
     } catch (err) {
@@ -55,7 +57,6 @@ const processRequest = async (req, res) => {
                 if (args[1] == PASSWORD) {
                     const url = args.slice(2, args.length).join(':');
                     downloadFile(url, res, () => {
-                        invalidateMenuCache();
                         return 'Updated menu and invalidated cache.';
                     });
                 }
